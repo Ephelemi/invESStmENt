@@ -8,7 +8,7 @@ from elasticsearch import Elasticsearch
 import csv
 
 # References:
-# Python Client - see https://elasticsearch-py.readthedocs.io/en/v8.7.0/
+# Python Client - see https://elasticsearch-py.readthedocs.io/en/v8.7.1/
 # Using EQL - see https://www.elastic.co/guide/en/elasticsearch/reference/current/eql.html
 
 # Load DATA_ID - Title data from files exported from the Wordpress CMS
