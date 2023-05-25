@@ -1,0 +1,11 @@
+
+
+# Skript zur Extraktion der Länge einer Aufzeichnung einer Person.
+#
+# Annahmne: Eine Datei mit belibig vielen Frames pro Person.
+# Plan: Datei als zuammenhängende Aufnahme der Maschine übergeben,
+#       mit Wert, ob in der Zeit interagiert wurde.
+# potentielle Fehlerquelle: Personen mit mehr als einer Datei.
+#
+# ToDo: Duration = Wert letzte f-Zeile der Datei in Millisekunden
+# Ausgabe: Timestamp als ID mit Duration in List?
