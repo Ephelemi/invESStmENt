@@ -11,30 +11,37 @@ import csv
 # Python Client - see https://elasticsearch-py.readthedocs.io/en/v8.7.1/
 # Using EQL - see https://www.elastic.co/guide/en/elasticsearch/reference/current/eql.html
 
-# Load DATA_ID - Title data from files exported from the Wordpress CMS
-cms_content_list = {}
-with open('Personen-Export.csv', 'r') as csv_file:
-    reader = csv.reader(csv_file)
-    for row in reader:
-        cms_content_list[row[0]] = row[1]
-with open('Contents-Export.csv', 'r') as csv_file:
-    reader = csv.reader(csv_file)
-    for row in reader:
-        cms_content_list[row[0]] = row[1]
-
 # Instantiate a client instance
 client = Elasticsearch("http://elk.informatik.unibw-muenchen.de:80")
 
 print("Instantiated Elastic Search client instance - now doing query")
 
 # Initialize the person list (map)
-person_list = {}
+activity_list = []
 
 # Init scroll by search
 result_size = 0
 data = client.search(
-   index = 'usage-2023.04.26',
-   query = {"bool": { "must": [ { "match": { 'TYPE': 'DISPLAY_SHOW' } }, {  "match": { 'DATA_TYPE': 'person' } } ] } },
+   index = 'usage-2023.03.23',
+   query = {"bool": { "should": [ 
+         { "match": { 'ACTIVITY': 'TOUCHPRESSED' } }, 
+         { "match": { 'ACTIVITY': 'TOUCHRELEASED' } },
+         { "match": { 'ACTIVITY': 'DRAGGED' } },
+         { "match": { 'ACTIVITY': 'TOUCH_RESHUFFLE_TEASER' } },
+         { "match": { 'ACTIVITY': 'TOUCH_NEXT_VISUAL_STATE_DETAIL' } },
+         { "match": { 'ACTIVITY': 'TOUCH_GRAPH_OPENED' } },
+         { "match": { 'ACTIVITY': 'TOUCH_NEXT_VISUAL_STATE_PREVIEW' } },
+         { "match": { 'ACTIVITY': 'TOUCH_GRAPH_CLOSED' } },
+         { "match": { 'ACTIVITY': 'TOUCH_GRAPH_NAVIGATED' } },
+         { "match": { 'ACTIVITY': 'TOUCH_SHOW_MESSHALLPLAN' } },
+         { "match": { 'ACTIVITY': 'TOUCH_RESHUFFLE_FLOW' } },
+         { "match": { 'ACTIVITY': 'TOUCH_CREATE_FLOW_ITEM' } },
+         { "match": { 'ACTIVITY': 'TOUCH_SHOW_WEBVIEW' } },
+         { "match": { 'ACTIVITY': 'User Touch' } },
+         { "match": { 'ACTIVITY': 'GRAPH_CLOSED' } },
+         { "match": { 'ACTIVITY': 'GRAPH_OPENED' } },
+      ] } },
+
    scroll = '2m', # length of time to keep search context
    size = 10000
 )
@@ -49,12 +56,8 @@ print("returned %d hits" % scroll_size)
 while scroll_size > 0:
     # Iterate through batch of results
     for hit in data['hits']['hits']:
-       data_type = hit["_source"]['DATA_TYPE']
-       data_id = hit["_source"]['DATA_ID']
-       if data_id in person_list:
-          person_list[data_id] += 1
-       else:
-          person_list[data_id] = 1
+       timestamp = hit["_source"]['@timestamp']
+       activity_list.append(timestamp)   
     # Update the scroll ID
     data = client.scroll(scroll_id=sid, scroll='2m')
     sid = data['_scroll_id']
@@ -65,12 +68,8 @@ while scroll_size > 0:
     
 client.clear_scroll(scroll_id=sid)
 
-print("Got %d hits altogether" % result_size)
-
 # Now print results
-for data_id, score in person_list.items():
-   label = data_id
-   if (label.startswith('wp://cms.communitymirrors.net:')):
-     label = cms_content_list[label[30:]];
-   print(label + ": " + str(score))
-   
+for activity in activity_list:
+    print(activity)
+
+print("\nGot %d hits altogether" % result_size)
