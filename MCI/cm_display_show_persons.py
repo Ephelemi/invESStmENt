@@ -6,6 +6,7 @@
 
 from elasticsearch import Elasticsearch
 import csv
+import datetime
 
 # References:
 # Python Client - see https://elasticsearch-py.readthedocs.io/en/v8.7.1/
@@ -73,4 +74,3 @@ for data_id, score in person_list.items():
    if (label.startswith('wp://cms.communitymirrors.net:')):
      label = cms_content_list[label[30:]];
    print(label + ": " + str(score))
-   

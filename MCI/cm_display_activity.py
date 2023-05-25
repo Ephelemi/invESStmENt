@@ -6,6 +6,7 @@
 
 from elasticsearch import Elasticsearch
 import csv
+import datetime
 
 # References:
 # Python Client - see https://elasticsearch-py.readthedocs.io/en/v8.7.1/
@@ -68,8 +69,12 @@ while scroll_size > 0:
     
 client.clear_scroll(scroll_id=sid)
 
-# Now print results
-for activity in activity_list:
-    print(activity)
-
 print("\nGot %d hits altogether" % result_size)
+
+with open('activities.csv', 'w', newline='') as csvfile:
+    spamwriter = csv.writer(csvfile, delimiter=' ',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    for activity in activity_list:
+      spamwriter.writerow([activity])
+
+print(type(datetime.datetime.now()))
