@@ -13,8 +13,6 @@ def supernamefuereinesupermethode(rec):
     startTime = None
     endTime = None
     msTime = 0
-    blocknr= 0
-    spaltennummer = 0
 
     Schwelle = 0
     flag = 0 # 1 lesen, 0 blocked
@@ -32,7 +30,6 @@ def supernamefuereinesupermethode(rec):
             if msTime == 0 or msTime >= Schwelle: 
                 zähler +=1
                 Schwelle += 500
-                blocknr += 1
                 flag = 1
                 date = {'time0': endTime}
                 skellet.append(date)
@@ -52,13 +49,10 @@ def supernamefuereinesupermethode(rec):
             zeile = line.split(' ')
             if line.startswith('gro '):
                 skellet.append(zeile[1:])
-                spaltennummer += 1
             if line.startswith('v '):
                 skellet.append(zeile[1:])
-                spaltennummer += 1
             if line.startswith('k '):
                 skellet.append(zeile[1:])
-                spaltennummer += 1
 
     for brad in ieinTyp:
         utcTime = ieinTyp[brad]['start: '].replace(tzinfo=dateutil.tz.gettz('UTC'))
