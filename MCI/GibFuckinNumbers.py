@@ -4,32 +4,41 @@ import datetime, dateutil.tz
 import glob
 import os
 import sys
+import csv
 
 def supernamefuereinesupermethode(rec):
     ieinTyp = {}
     Rrrrrrgebnis = []
-    skellet = {}
+    skellet = []
     startTime = None
+    csvName = ""
     endTime = None
     msTime = 0
-    blocknr= 0
-    spaltennummer = 0
 
     Schwelle = 0
     flag = 0 # 1 lesen, 0 blocked
 
+    zähler = 0
+
+    date = {}
+
     for line in rec.splitlines():
         if line.startswith('ts ') and startTime is None:
             startTime = datetime.datetime.strptime(line[3:]+'000', '%Y-%m-%dT%H:%M:%S.%f')
+            csvName = line[3:] + ".csv"
         elif line.startswith('f '):
             msTime = int(line[2:])
             endTime = startTime + datetime.timedelta(milliseconds=msTime)
             if msTime == 0 or msTime >= Schwelle: 
-                Schwelle += 500
-                blocknr += 1
+                zähler +=1
+                Schwelle += 100
                 flag = 1
-                skellet[blocknr] = {'time': endTime}
-            else: flag = 0
+                date = {'time0': endTime}
+                skellet.append(date)
+                
+            else: 
+                flag = 0
+                
 
         elif line.startswith('p '):
             teile = line.split(' ')
@@ -41,22 +50,56 @@ def supernamefuereinesupermethode(rec):
         elif flag == 1:
             zeile = line.split(' ')
             if line.startswith('gro '):
-                skellet[blocknr][spaltennummer] = {'gro': zeile[1:]}
-                spaltennummer += 1
+                for val in zeile[1:]:
+                    skellet.append(val)
             if line.startswith('v '):
-                skellet[blocknr][spaltennummer] = {'v': zeile[1:]}
-                spaltennummer += 1
+                for val in zeile[1:]:
+                    skellet.append(val)
             if line.startswith('k '):
-                skellet[blocknr][spaltennummer] = {'k': zeile[1:]}
-                spaltennummer += 1
+                for val in zeile[2:]:
+                    skellet.append(val)
 
     for brad in ieinTyp:
         utcTime = ieinTyp[brad]['start: '].replace(tzinfo=dateutil.tz.gettz('UTC'))
         Rrrrrrgebnis.append(utcTime.astimezone(dateutil.tz.gettz('Europe/Berlin')))
 
     #print(brad, startTime, endTime)
-    print(skellet)
-    return Rrrrrrgebnis
+    #print(skellet)
+
+    print(zähler)
+    counter = 0
+    list = []
+    with open(csvName, 'w') as csvfile:
+        filewriter = csv.writer(csvfile, delimiter=',')
+        
+        filewriter.writerow(
+            ['time', 'gro1', 'gro2', 'gro3', 'gro4', 'v1', 'v2', 'v3', 'k0x', 'k0y', 'k0z', 'k1x', 'k1y', 'k1z',
+             'k2x', 'k2y', 'k2z', 'k3x', 'k3y', 'k3z', 'k4x', 'k4y', 'k4z', 'k5x', 'k5y', 'k5z', 'k6x', 'k6y', 'k6z',
+             'k7x', 'k7y', 'k7z', 'k8x', 'k8y', 'k8z', 'k9x', 'k9y', 'k9z', 'k10x', 'k10y', 'k10z', 'k11x', 'k11y', 'k11z',
+             'k12x', 'k12y', 'k12z', 'k13x', 'k13y', 'k13z', 'k14x', 'k14y', 'k14z', 'k15x', 'k15y', 'k15z', 'k16x', 'k16y', 'k6z',
+             'k17x', 'k17y', 'k17z', 'k18x', 'k18y', 'k18z', 'k19x', 'k19y', 'k19z', 'k20x', 'k20y', 'k20z', 'k21x', 'k21y', 'k21z',
+             'k22x', 'k22y', 'k22z', 'k23x', 'k23y', 'k23z', 'k24x', 'k24y', 'k24z', 'k25x', 'k25y', 'k25z', 'k26x', 'k26y', 'k26z',
+             'k27x', 'k27y', 'k27z', 'k28x', 'k28y', 'k28z', 'k29x', 'k29y', 'k29z', 'k30x', 'k30y', 'k30z', 'k31x', 'k31y', 'k31z',
+             'k32x', 'k32y', 'k32z', 'k33x', 'k33y', 'k33z'])
+        for row in skellet:
+            strrow = str(row)
+            strrow = strrow.replace('{', '')
+            strrow = strrow.replace("'", '')
+            strrow = strrow.replace(':', '')
+            strrow = strrow.replace('time0', '')
+            strrow = strrow.replace('datetime.datetime(', '')
+            strrow = strrow.replace(')', '')
+            strrow = strrow.replace('}', '')
+            if(counter==110):
+                #filewriter.writerow('\n')
+                filewriter.writerow(list)
+                list = []
+                counter = 0
+            list.append(strrow)
+            counter += 1
+
+    return skellet
+
 
 if __name__ == '__main__':
     params = sys.argv[1:]
@@ -75,4 +118,4 @@ if __name__ == '__main__':
         with open(param, 'r') as fp:
             datei = fp.read()
         menschenvorkamera += supernamefuereinesupermethode(datei)
-
+    

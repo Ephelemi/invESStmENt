@@ -7,6 +7,7 @@
 from elasticsearch import Elasticsearch
 import csv
 import datetime
+import pandas as pd
 
 # References:
 # Python Client - see https://elasticsearch-py.readthedocs.io/en/v8.7.1/
@@ -17,15 +18,19 @@ client = Elasticsearch("http://elk.informatik.unibw-muenchen.de:80")
 
 print("Instantiated Elastic Search client instance - now doing query")
 
+year='2023'
+month='03'
+day='23'
+
 # Initialize the person list (map)
 activity_list = []
 
 # Init scroll by search
 result_size = 0
 data = client.search(
-   index = 'usage-2023.03.23',
-   query = {"bool": { "should": [ 
-         { "match": { 'ACTIVITY': 'TOUCHPRESSED' } }, 
+   index = 'usage-' + year + '.' + month + '.' + day,
+   query = {"bool": { "should": [
+         { "match": { 'ACTIVITY': 'TOUCHPRESSED' } },
          { "match": { 'ACTIVITY': 'TOUCHRELEASED' } },
          { "match": { 'ACTIVITY': 'DRAGGED' } },
          { "match": { 'ACTIVITY': 'TOUCH_RESHUFFLE_TEASER' } },
@@ -58,7 +63,7 @@ while scroll_size > 0:
     # Iterate through batch of results
     for hit in data['hits']['hits']:
        timestamp = hit["_source"]['@timestamp']
-       activity_list.append(timestamp)   
+       activity_list.append(timestamp)
     # Update the scroll ID
     data = client.scroll(scroll_id=sid, scroll='2m')
     sid = data['_scroll_id']
@@ -66,12 +71,12 @@ while scroll_size > 0:
     scroll_size = len(data['hits']['hits'])
     result_size += scroll_size
     print("returned %d hits" % scroll_size)
-    
+
 client.clear_scroll(scroll_id=sid)
 
 print("\nGot %d hits altogether" % result_size)
 
-with open('activities.csv', 'w', newline='') as csvfile:
+with open('activities-' + year + '-' + month + '-' + day + '.csv', 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=' ',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
     for activity in activity_list:
