@@ -31,7 +31,7 @@ def supernamefuereinesupermethode(rec):
             endTime = startTime + datetime.timedelta(milliseconds=msTime)
             if msTime == 0 or msTime >= Schwelle: 
                 zähler +=1
-                Schwelle += 100
+                Schwelle += 250
                 flag = 1
                 date = {'time0': endTime}
                 skellet.append(date)
@@ -67,7 +67,6 @@ def supernamefuereinesupermethode(rec):
     #print(skellet)
 
     print(zähler)
-    counter = 0
     list = []
     with open(csvName, 'w') as csvfile:
         filewriter = csv.writer(csvfile, delimiter=',')
@@ -83,6 +82,11 @@ def supernamefuereinesupermethode(rec):
              'k32x', 'k32y', 'k32z', 'k33x', 'k33y', 'k33z'])
         for row in skellet:
             strrow = str(row)
+
+            if 'datetime' in strrow and len(list) > 0:
+                filewriter.writerow(list)
+                list = []
+
             strrow = strrow.replace('{', '')
             strrow = strrow.replace("'", '')
             strrow = strrow.replace(':', '')
@@ -90,13 +94,8 @@ def supernamefuereinesupermethode(rec):
             strrow = strrow.replace('datetime.datetime(', '')
             strrow = strrow.replace(')', '')
             strrow = strrow.replace('}', '')
-            if(counter==110):
-                #filewriter.writerow('\n')
-                filewriter.writerow(list)
-                list = []
-                counter = 0
+
             list.append(strrow)
-            counter += 1
 
     return skellet
 
