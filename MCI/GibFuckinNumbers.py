@@ -52,12 +52,21 @@ def supernamefuereinesupermethode(rec):
             if line.startswith('gro '):
                 for val in zeile[1:]:
                     skellet.append(val)
+                    #auffüllen mit 0 falls Werte fehlen
+                    for i in range(4 - len(zeile[1:])):
+                        skellet.append(0)
             if line.startswith('v '):
                 for val in zeile[1:]:
                     skellet.append(val)
+                    # auffüllen mit 0 falls Werte fehlen
+                    for i in range(3 - len(zeile[1:])):
+                        skellet.append(0)
             if line.startswith('k '):
                 for val in zeile[2:]:
                     skellet.append(val)
+                    # auffüllen mit 0 falls Werte fehlen
+                    for i in range(3 - len(zeile[2:])):
+                        skellet.append(0)
 
     for brad in ieinTyp:
         utcTime = ieinTyp[brad]['start: '].replace(tzinfo=dateutil.tz.gettz('UTC'))
