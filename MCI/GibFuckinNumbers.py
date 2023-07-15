@@ -25,7 +25,7 @@ def supernamefuereinesupermethode(rec):
     for line in rec.splitlines():
         if line.startswith('ts ') and startTime is None:
             startTime = datetime.datetime.strptime(line[3:]+'000', '%Y-%m-%dT%H:%M:%S.%f')
-            csvName = line[3:] + ".csv"
+            csvName = line[3:].replace(":", "-") + ".csv"
         elif line.startswith('f '):
             msTime = int(line[2:])
             endTime = startTime + datetime.timedelta(milliseconds=msTime)
