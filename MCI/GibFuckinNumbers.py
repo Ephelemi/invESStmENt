@@ -89,11 +89,13 @@ def supernamefuereinesupermethode(rec):
              'k22x', 'k22y', 'k22z', 'k23x', 'k23y', 'k23z', 'k24x', 'k24y', 'k24z', 'k25x', 'k25y', 'k25z', 'k26x', 'k26y', 'k26z',
              'k27x', 'k27y', 'k27z', 'k28x', 'k28y', 'k28z', 'k29x', 'k29y', 'k29z', 'k30x', 'k30y', 'k30z', 'k31x', 'k31y', 'k31z',
              'k32x', 'k32y', 'k32z', 'k33x', 'k33y', 'k33z'])
+        
         for row in skellet:
             strrow = str(row)
 
             if 'datetime' in strrow and len(list) > 0:
-                filewriter.writerow(list)
+                if len(list) == 110:
+                    filewriter.writerow(list)
                 list = []
 
             strrow = strrow.replace('{', '')
